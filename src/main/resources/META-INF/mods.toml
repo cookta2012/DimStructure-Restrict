@@ -1,0 +1,28 @@
+license = "MIT"
+loaderVersion = "[47,)"
+modLoader = "javafml"
+[[mods]]
+description = '''
+Server‑side structure dimension filter with dual‑view config:
+- "structures": per‑structure whitelist/blacklist of dimensions (highest priority)
+- "dimensions": per‑dimension whitelist/blacklist of structures
+If both lists are provided for a single rule the server crashes; if neither list
+is present the entry is ignored (unrestricted). Structures not listed at all are unrestricted.
+'''
+displayName = "Dimimensional Structure Restrict"
+modId = "dimstructrestrict"
+version = "0.0.0"
+[[mixins]]
+config = "mixins.dimstructrestrict.json"
+[[dependencies.dimstructrestrict]]
+mandatory = true
+modId = "forge"
+ordering = "NONE"
+side = "BOTH"
+versionRange = "[47,)"
+[[dependencies.dimstructrestrict]]
+mandatory = true
+modId = "minecraft"
+ordering = "NONE"
+side = "BOTH"
+versionRange = "[1.20.1]"
