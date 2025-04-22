@@ -2,7 +2,7 @@
   "required": true,
   "package": "com.cookta2012.dimstructrestrict.mixin",
   "mixins": [
-    "ChunkGeneratorMixin", "StructureManagerAccessor"
+    "ChunkGeneratorMixin", "StructureManagerAccessor", "StructureStartMixin"
   ],
   "refmap": "mixins.dimstructrestrict.refmap.json",
   "compatibilityLevel": "JAVA_17",
