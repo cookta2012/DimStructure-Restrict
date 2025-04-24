@@ -3,21 +3,23 @@ package com.cookta2012.dimstructrestrict;
 import java.util.Objects;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import net.minecraft.resources.ResourceLocation;
 
 
 
-public abstract class Rule {
-	
+public abstract class Rule {	
     public enum Mode { WHITELIST, BLACKLIST }
     public enum Type { DIMENSION, STRUCTURE }
     
-    private final ResourceLocation id;    
-    private final Type type;
-    private final Mode mode;
-    private final Set<ResourceLocation> resource;
-    private final Boolean false_place;
-    private final Boolean active;
+    public final ResourceLocation id;    
+    public final Type type;
+    public final Mode mode;
+    public final Set<ResourceLocation> resource;
+    public final Boolean false_place;
+    public final Boolean active;
 
     public Rule(ResourceLocation id, Type type, Mode mode, Set<ResourceLocation> resource, Boolean false_place, Boolean active) {
     	this.id = id;
@@ -28,7 +30,7 @@ public abstract class Rule {
         this.active = active;
     }
 
-    private String getType() {
+    public String getType() {
         return switch (this.type) {
             case DIMENSION -> "Dimension";
             case STRUCTURE -> "Structure";
@@ -36,7 +38,7 @@ public abstract class Rule {
         };
     }
     
-    private String getMode() {
+    public String getMode() {
         return switch (this.mode) {
             case WHITELIST -> "Whitelist";
             case BLACKLIST -> "Blacklist";
@@ -77,39 +79,63 @@ public abstract class Rule {
     
     
 	public Boolean isRestricted(ResourceLocation targetResource, Boolean isClean) {
+		
+		DimensionalStructureRestrict.logMsg("Begin Processing Rule");
 		// Short circuit due to rule inactive or false_place active
 		if(!this.active) { 
-			DimensionalStructureRestrict.LOGGER.debug("Rule not active" + this.type.toString());
+			DimensionalStructureRestrict.logMsg("Rule not active" + this.type.toString());
 			return false; 
 		}
 		if(this.false_place && !isClean) {
-			DimensionalStructureRestrict.LOGGER.debug("Rule set to false_place");
-			{ return false; }
+			DimensionalStructureRestrict.logMsg("Rule set to false_place");
+			return false;
 		}
         if (this.mode == Mode.WHITELIST) {
             if (!this.resource().contains(targetResource)) {
-            	logDebugMessage( isClean, targetResource );
+            	logDebugMessage( targetResource, isClean );
                 return true;
             }
         } else { // BLACKLIST
             if (this.resource().contains(targetResource)) {
-            	logDebugMessage( isClean, targetResource);
+            	logDebugMessage( targetResource, isClean );
             	return true;
             }
         }
+        DimensionalStructureRestrict.logMsg("Fell Through Processing Rule");
+        DimensionalStructureRestrict.logMsg("---START What Could Have Been--------");
+		logDebugMessage( targetResource, isClean );
+		DimensionalStructureRestrict.logMsg("---END What Could Have Been-------");
         return false;
     }
 	
-	private void logDebugMessage(Boolean isClean, ResourceLocation targetResource) {
-		DimensionalStructureRestrict.LOGGER.debug(getType() + " Rule " + this.getMode()
-        + (!isClean ? "un" : "" ) + "cleanly prevented generation of structure: " 
-        + ((this.type == Type.DIMENSION) ? targetResource.toString() : id.toString())
-        + " in Dimension: " 
-        + ((this.type == Type.STRUCTURE) ? targetResource.toString() : id.toString())
-        + " due to " 
-        + ((this.mode == Mode.WHITELIST) ? "not being whitelisted": "being blacklisted")
-        );
+	private void logDebugMessage(ResourceLocation targetResource, Boolean isClean) {
+	    String ruleType = getType(); // "Dimension" or "Structure"
+	    String modeText = getMode(); // "WHITELIST" or "BLACKLIST"
+	    String preventionType = isClean ? "cleanly" : "uncleanly";
+
+	    String blockedInDimension = (this.type == Type.DIMENSION) ? id.toString() : targetResource.toString() ;
+	    String blockedResource = (this.type == Type.STRUCTURE) ?  id.toString() : targetResource.toString();
+
+	    String reason = (this.mode == Mode.WHITELIST)
+	        ? "not being whitelisted"
+	        : "being blacklisted";
+
+	    StringBuilder msg = new StringBuilder();
+	    msg.append(ruleType)
+	       .append(" Rule ")
+	       .append(modeText)
+	       .append(" ")
+	       .append(preventionType)
+	       .append(" prevented generation of Structure: ")
+	       .append(blockedResource)
+	       .append(" in Dimension: ")
+	       .append(blockedInDimension)
+	       .append(" due to ")
+	       .append(reason);
+
+	    DimensionalStructureRestrict.logMsg(msg.toString());
 	}
+
 
 }
 

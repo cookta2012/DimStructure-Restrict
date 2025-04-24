@@ -23,6 +23,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 import com.cookta2012.dimstructrestrict.DimensionalStructureRestrict;
 import com.cookta2012.dimstructrestrict.Rule;
+import com.cookta2012.dimstructrestrict.Rule.Mode;
+import com.cookta2012.dimstructrestrict.Rule.Type;
 
 
 @Mixin(ChunkGenerator.class)
@@ -48,20 +50,78 @@ public abstract class ChunkGeneratorMixin {
 		    ResourceLocation structureId = registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure);
 		    LevelAccessor level = ((StructureManagerAccessor)manager).getLevel();
 		    ResourceLocation dimension = ((WorldGenLevel)level).getLevel().dimension().location();
-		    DimensionalStructureRestrict.LOGGER.debug("HIT structure: " + structureId + " in Dimension: " + dimension);
+		    //DimensionalStructureRestrict.LOGGER.debug("HIT structure: " + structureId + " in Dimension: " + dimension);
 		    // dimension/structure filter logic
 		    Rule sRule = DimensionalStructureRestrict.STRUCTURE_RULES.get(structureId);
-		    if (sRule != null && sRule.isRestricted(dimension, true)) {
+		    if (sRule != null && (sRule.isRestricted(dimension, true) || isRestricted( sRule, dimension, true ))) {
 		        cir.setReturnValue(false);
 		        return;
 		    }
 
 		    Rule dRule = DimensionalStructureRestrict.DIMENSION_RULES.get(dimension);
-		    if (dRule != null && sRule.isRestricted(structureId, true)) {
+		    if (dRule != null && (dRule.isRestricted(structureId, true) || isRestricted( dRule, structureId, true ))) {
 		        cir.setReturnValue(false);
 		        return;
 		    }
 		}
+	public Boolean isRestricted(Rule rule, ResourceLocation targetResource, Boolean isClean) {
+		
+		DimensionalStructureRestrict.logMsg("Begin Processing Rule");
+		// Short circuit due to rule inactive or false_place active
+		if(!rule.active) { 
+			DimensionalStructureRestrict.logMsg("Rule not active" + rule.type.toString());
+			return false; 
+		}
+		if(rule.false_place && !isClean) {
+			DimensionalStructureRestrict.logMsg("Rule set to false_place");
+			return false;
+		}
+        if (rule.mode == Mode.WHITELIST) {
+            if (!rule.resource().contains(targetResource)) {
+            	logDebugMessage(rule, targetResource, isClean );
+                return true;
+            }
+        } else { // BLACKLIST
+            if (rule.resource().contains(targetResource)) {
+            	logDebugMessage(rule, targetResource, isClean );
+            	return true;
+            }
+        }
+        DimensionalStructureRestrict.logMsg("Fell Through Processing Rule INSIDE CHUNK GENERATOR");
+        DimensionalStructureRestrict.logMsg("---START What Should Have Been INSIDE CHUNK GENERATOR--------");
+		logDebugMessage(rule,  targetResource, isClean );
+		DimensionalStructureRestrict.logMsg("---END What Should Have Been INSIDE CHUNK GENERATOR-------");
+        return false;
+    }
+	
+	private void logDebugMessage(Rule rule, ResourceLocation targetResource, Boolean isClean) {
+	    String ruleType = rule.getType(); // "Dimension" or "Structure"
+	    String modeText = rule.getMode(); // "WHITELIST" or "BLACKLIST"
+	    String preventionType = isClean ? "cleanly" : "uncleanly";
+
+	    String blockedInDimension = (rule.type == Type.DIMENSION) ? rule.id.toString() : targetResource.toString() ;
+	    String blockedResource = (rule.type == Type.STRUCTURE) ?  rule.id.toString() : targetResource.toString();
+
+	    String reason = (rule.mode == Mode.WHITELIST)
+	        ? "not being whitelisted"
+	        : "being blacklisted";
+
+	    StringBuilder msg = new StringBuilder();
+	    msg.append("INSIDE CHUNK GENERATOR CLASS: ")
+	       .append(ruleType)
+	       .append(" Rule ")
+	       .append(modeText)
+	       .append(" ")
+	       .append(preventionType)
+	       .append(" prevented generation of Structure: ")
+	       .append(blockedResource)
+	       .append(" in Dimension: ")
+	       .append(blockedInDimension)
+	       .append(" due to ")
+	       .append(reason);
+
+	    DimensionalStructureRestrict.logMsg(msg.toString());
+	}
 }
 
 

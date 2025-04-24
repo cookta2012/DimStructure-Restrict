@@ -1,37 +1,64 @@
 package com.cookta2012.dimstructrestrict;
 
+import com.cookta2012.dimstructrestrict.DimensionalStructureRestrictConfig.Common;
 import com.cookta2012.dimstructrestrict.Rule.Mode;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
+import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
+
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
+
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.nio.file.*;
 import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+    
 @Mod("dimstructrestrict")
 public class DimensionalStructureRestrict {
-    public static final Logger LOGGER = LoggerFactory.getLogger("dimstructrestrict");
+	
+	private static final Logger LOGGER = LogUtils.getLogger();
+	public static final Logger getLogger() {return LOGGER;}
+	
 
     public static final Map<ResourceLocation, Rule> STRUCTURE_RULES = new HashMap<>();
     public static final Map<ResourceLocation, Rule> DIMENSION_RULES   = new HashMap<>();
-
-    public DimensionalStructureRestrict() { loadConfig(); }
     
-    private Boolean dirtyConfig = false;    
-    private String configFile  = "DimStruct Restrict.json";
+    private static final String configFile  = "dimstructrestrict.json";
+
+    private static Boolean dirtyConfig = false;
+    
     
     public Boolean isConfigDirty() { return dirtyConfig; }
     public void setConfigDirty() { dirtyConfig = true; }
     private void setConfigClean() { dirtyConfig = false; }
 
-    private void loadConfig() {
+    public static void logMsg(StringBuilder builder) {
+    	LOGGER.info("String-Builder");
+    	logMsg(builder.toString());    		
+    }
+    
+    public static void logMsg(String builder) {
+    	//throw new RuntimeException("Failed to save");
+    	
+    	getLogger().info("String info");
+    	getLogger().info("INFO: " + builder);    		
+    	
+    }
+    public DimensionalStructureRestrict() { 
+    	LOGGER.info("[dimstructrestrict] Attempting to load config file"); 
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DimensionalStructureRestrictConfig.COMMON_SPEC);
+        LOGGER.info("[dimstructrestrict] Attempting to load json config file"); 
+    	loadJSONConfig();
+    }
+
+    private void loadJSONConfig() {
         Path cfg = FMLPaths.CONFIGDIR.get().resolve(configFile);
         try {
             if (Files.notExists(cfg)) {
@@ -74,8 +101,8 @@ public class DimensionalStructureRestrict {
                 	   throw new IllegalStateException("\"" + configFile + "\" must be proper JSON or Structure array");
                    }
                    if(isConfigDirty()) {
-                	   saveConfig();
-                	   loadConfig();
+                	   saveJSONConfig();
+                	   loadJSONConfig();
                    }
                }
         } catch (com.google.gson.JsonSyntaxException syntaxEx) {
@@ -85,7 +112,7 @@ public class DimensionalStructureRestrict {
         }
     }
     
-    private void saveConfig() {
+    private void saveJSONConfig() {
         Path cfg = FMLPaths.CONFIGDIR.get().resolve(configFile);
         JsonObject root = new JsonObject();
 
@@ -138,7 +165,7 @@ public class DimensionalStructureRestrict {
         try {
             Files.writeString(cfg, new GsonBuilder().setPrettyPrinting().create().toJson(root));
             setConfigClean();
-            LOGGER.debug("Config saved to " + cfg);
+            LOGGER.info("Config saved to " + cfg);
         } catch (Exception ex) {
             throw new RuntimeException("Failed to save \"" + configFile + "\": " + ex.getMessage(), ex);
         }
