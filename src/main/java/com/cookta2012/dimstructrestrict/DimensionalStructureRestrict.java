@@ -1,6 +1,4 @@
 package com.cookta2012.dimstructrestrict;
-
-import com.cookta2012.dimstructrestrict.DimensionalStructureRestrictConfig.Common;
 import com.cookta2012.dimstructrestrict.Rule.Mode;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
@@ -23,8 +21,7 @@ import java.util.*;
 @Mod("dimstructrestrict")
 public class DimensionalStructureRestrict {
 	
-	private static final Logger LOGGER = LogUtils.getLogger();
-	public static final Logger getLogger() {return LOGGER;}
+	public static final Logger LOGGER = LogUtils.getLogger();
 	
 
     public static final Map<ResourceLocation, Rule> STRUCTURE_RULES = new HashMap<>();
@@ -38,23 +35,30 @@ public class DimensionalStructureRestrict {
     public Boolean isConfigDirty() { return dirtyConfig; }
     public void setConfigDirty() { dirtyConfig = true; }
     private void setConfigClean() { dirtyConfig = false; }
+    
+    public static final Boolean isDebug() { 
+    	return DimensionalStructureRestrictConfig.COMMON.debug.get(); 
+    	};
 
-    public static void logMsg(StringBuilder builder) {
-    	LOGGER.info("String-Builder");
-    	logMsg(builder.toString());    		
+	public static boolean isLogPreventedStructures() {
+		return DimensionalStructureRestrictConfig.COMMON.log_prevented_structures.get();
+	}
+	public static boolean isLogAllowedStructures() {
+		return DimensionalStructureRestrictConfig.COMMON.log_allowed_structures.get();
+	}
+    public static void logDebugMsg(StringBuilder builder) { 
+    		logDebugMsg(builder.toString()); 	
     }
     
-    public static void logMsg(String builder) {
+    public static void logDebugMsg(String message) {
     	//throw new RuntimeException("Failed to save");
-    	
-    	getLogger().info("String info");
-    	getLogger().info("INFO: " + builder);    		
+    		LOGGER.info("[DEBUG]: " + message);
     	
     }
     public DimensionalStructureRestrict() { 
-    	LOGGER.info("[dimstructrestrict] Attempting to load config file"); 
+    	LOGGER.info("Attempting to load config file"); 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DimensionalStructureRestrictConfig.COMMON_SPEC);
-        LOGGER.info("[dimstructrestrict] Attempting to load json config file"); 
+        LOGGER.info("Attempting to load json config file"); 
     	loadJSONConfig();
     }
 
@@ -73,8 +77,9 @@ public class DimensionalStructureRestrict {
   ],
   "dimensions": [
     {
-      "id": "minecraft:the_end",
-      "blacklist": ["minecraft:village_plains"]
+      "id": "minecraft:overworld",
+      "whitelist": [],
+      "active": true
     }
   ]
 }
@@ -102,6 +107,8 @@ public class DimensionalStructureRestrict {
                    }
                    if(isConfigDirty()) {
                 	   saveJSONConfig();
+                	   STRUCTURE_RULES.clear();
+                	   DIMENSION_RULES.clear();
                 	   loadJSONConfig();
                    }
                }

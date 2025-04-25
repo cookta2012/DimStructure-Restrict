@@ -17,13 +17,22 @@ public class DimensionalStructureRestrictConfig {
 
     public static class Common {
         public final ForgeConfigSpec.BooleanValue log_prevented_structures;
+        public final ForgeConfigSpec.BooleanValue log_allowed_structures;
+        public final ForgeConfigSpec.BooleanValue debug;
 
         Common(ForgeConfigSpec.Builder builder) {
             builder.push("general");
-
+            
+            
+            log_allowed_structures = builder
+                    .comment("Enable logging of allowed structures. This is on by default. If you use this on a server and dont want to waste space with constant spam turn it off.")
+                    .define("log-allowed-structures", true); // default: true
             log_prevented_structures = builder
                 .comment("Enable logging of prevented structures. This is on by default. If you use this on a server and dont want to waste space with constant spam turn it off.")
                 .define("log-prevented-structures", true); // default: true
+            debug = builder
+                    .comment("Enable debug logging. This is on by default. If you use this on a server and dont want to waste space with constant spam turn it off.")
+                    .define("debug", true); // default: true
 
             builder.pop();
         }
