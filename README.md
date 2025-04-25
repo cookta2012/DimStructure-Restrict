@@ -20,31 +20,30 @@ Initial release will be 1.20.1 other versions will be coming later.
 
 The config file is located at:
 ```
-<minecraft_root>/config/DimStruct Restrict.json
+<minecraft_root>/config/dimstructrestrict.json
 ```
 
 If the file doesn't exist, it will be generated with example entries.
 
 ---
 
-### 📐 Structure of `DimStruct Restrict.json`
+### 📐 Structure of `dimstructrestrict.json`
 
 ```jsonc
 {
   "structures": [
-    {
-      "id": "minecraft:village_plains",        // Structure ID
-      "whitelist": ["minecraft:overworld"],    // Allowed dimensions
-      "false_place": false,                    // If true, the structure will be "falsely placed" (may break mods)
-      "active": true                           // Whether this rule is active
+    {                                       // Individual structure rules will override dimension rules FULL STOP
+      "id": "minecraft:village_plains",     // Structure ID
+      "whitelist": ["minecraft:overworld"], // Allowed dimensions
+      "false_place": false,                 // If true, the structure will be "falsely placed" (may break mods)
+      "active": true                        // Whether this rule is active
     }
   ],
   "dimensions": [
     {
-      "id": "minecraft:the_nether",            // Dimension ID
-      "blacklist": ["minecraft:village_plains"], // Structures blocked in this dimension
-      "false_place": false,
-      "active": false
+      "id": "minecraft:overworld",        // Dimension ID
+      "whitelist": [],                    // Structures allowed in this dimension
+      "active": true
     }
   ]
 }
@@ -61,7 +60,7 @@ Only listed dimensions or structures are allowed.
 Listed dimensions or structures will be prevented.
 
 ### ⚙️ `false_place` (optional, default `false`)
-If `true`, prevents the structure from placing **without skipping the generation step** — useful for mods that rely on internal placement counts.
+If `true`, prevents the structure from placing **without skipping the generation step** meaning it is marked on the map as generated.
 
 > ⚠️ May cause issues with some structure-dependent mods.
 
@@ -112,7 +111,7 @@ Each `Rule` is backed by:
 
 ## 🧑‍💻 Developer Notes
 
-- Author: **Troy Allen Cook**
+- Author: **Troy Cook**
 - GitHub: [@cookta2012](https://github.com/cookta2012)
 - Language: Java
 - Environment: Minecraft Forge for Minecraft 1.20.1

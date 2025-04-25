@@ -1,37 +1,68 @@
 package com.cookta2012.dimstructrestrict;
-
 import com.cookta2012.dimstructrestrict.Rule.Mode;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
+import com.mojang.logging.LogUtils;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
+
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLPaths;
+
+import org.slf4j.Logger;
 
 import java.io.BufferedReader;
 import java.nio.file.*;
 import java.util.*;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+    
 @Mod("dimstructrestrict")
 public class DimensionalStructureRestrict {
-    public static final Logger LOGGER = LoggerFactory.getLogger("dimstructrestrict");
+	
+	public static final Logger LOGGER = LogUtils.getLogger();
+	
 
     public static final Map<ResourceLocation, Rule> STRUCTURE_RULES = new HashMap<>();
     public static final Map<ResourceLocation, Rule> DIMENSION_RULES   = new HashMap<>();
-
-    public DimensionalStructureRestrict() { loadConfig(); }
     
-    private Boolean dirtyConfig = false;    
-    private String configFile  = "DimStruct Restrict.json";
+    private static final String configFile  = "dimstructrestrict.json";
+
+    private static Boolean dirtyConfig = false;
+    
     
     public Boolean isConfigDirty() { return dirtyConfig; }
     public void setConfigDirty() { dirtyConfig = true; }
     private void setConfigClean() { dirtyConfig = false; }
+    
+    public static final Boolean isDebug() { 
+    	return DimensionalStructureRestrictConfig.COMMON.debug.get(); 
+    	};
 
-    private void loadConfig() {
+	public static boolean isLogPreventedStructures() {
+		return DimensionalStructureRestrictConfig.COMMON.log_prevented_structures.get();
+	}
+	public static boolean isLogAllowedStructures() {
+		return DimensionalStructureRestrictConfig.COMMON.log_allowed_structures.get();
+	}
+    public static void logDebugMsg(StringBuilder builder) { 
+    		logDebugMsg(builder.toString()); 	
+    }
+    
+    public static void logDebugMsg(String message) {
+    	//throw new RuntimeException("Failed to save");
+    		LOGGER.info("[DEBUG]: " + message);
+    	
+    }
+    public DimensionalStructureRestrict() { 
+    	LOGGER.info("Attempting to load config file"); 
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DimensionalStructureRestrictConfig.COMMON_SPEC);
+        LOGGER.info("Attempting to load json config file"); 
+    	loadJSONConfig();
+    }
+
+    private void loadJSONConfig() {
         Path cfg = FMLPaths.CONFIGDIR.get().resolve(configFile);
         try {
             if (Files.notExists(cfg)) {
@@ -46,8 +77,9 @@ public class DimensionalStructureRestrict {
   ],
   "dimensions": [
     {
-      "id": "minecraft:the_end",
-      "blacklist": ["minecraft:village_plains"]
+      "id": "minecraft:overworld",
+      "whitelist": [],
+      "active": true
     }
   ]
 }
@@ -74,8 +106,10 @@ public class DimensionalStructureRestrict {
                 	   throw new IllegalStateException("\"" + configFile + "\" must be proper JSON or Structure array");
                    }
                    if(isConfigDirty()) {
-                	   saveConfig();
-                	   loadConfig();
+                	   saveJSONConfig();
+                	   STRUCTURE_RULES.clear();
+                	   DIMENSION_RULES.clear();
+                	   loadJSONConfig();
                    }
                }
         } catch (com.google.gson.JsonSyntaxException syntaxEx) {
@@ -85,7 +119,7 @@ public class DimensionalStructureRestrict {
         }
     }
     
-    private void saveConfig() {
+    private void saveJSONConfig() {
         Path cfg = FMLPaths.CONFIGDIR.get().resolve(configFile);
         JsonObject root = new JsonObject();
 
@@ -138,7 +172,7 @@ public class DimensionalStructureRestrict {
         try {
             Files.writeString(cfg, new GsonBuilder().setPrettyPrinting().create().toJson(root));
             setConfigClean();
-            LOGGER.debug("Config saved to " + cfg);
+            LOGGER.info("Config saved to " + cfg);
         } catch (Exception ex) {
             throw new RuntimeException("Failed to save \"" + configFile + "\": " + ex.getMessage(), ex);
         }

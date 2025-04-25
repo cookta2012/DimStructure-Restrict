@@ -10,8 +10,8 @@ If both lists are provided for a single rule the server crashes; if neither list
 is present the entry is ignored (unrestricted). Structures not listed at all are unrestricted.
 '''
 displayName = "Dimimensional Structure Restrict"
-modId = "dimstructrestrict"
-version = "0.0.0"
+modId = "${mod_id}"
+version = "${version}"
 [[mixins]]
 config = "mixins.dimstructrestrict.json"
 [[dependencies.dimstructrestrict]]
@@ -25,4 +25,4 @@ mandatory = true
 modId = "minecraft"
 ordering = "NONE"
 side = "BOTH"
-versionRange = "[1.20.1]"
+versionRange = "[1.20.1,1.21.+)"

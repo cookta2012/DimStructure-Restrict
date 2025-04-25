@@ -48,16 +48,25 @@ public abstract class ChunkGeneratorMixin {
 		    ResourceLocation structureId = registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure);
 		    LevelAccessor level = ((StructureManagerAccessor)manager).getLevel();
 		    ResourceLocation dimension = ((WorldGenLevel)level).getLevel().dimension().location();
-		    DimensionalStructureRestrict.LOGGER.debug("HIT structure: " + structureId + " in Dimension: " + dimension);
+		    //DimensionalStructureRestrict.LOGGER.debug("HIT structure: " + structureId + " in Dimension: " + dimension);
 		    // dimension/structure filter logic
 		    Rule sRule = DimensionalStructureRestrict.STRUCTURE_RULES.get(structureId);
-		    if (sRule != null && sRule.isRestricted(dimension, true)) {
-		        cir.setReturnValue(false);
+		    if (sRule != null) {
+		    	if( sRule.isRestricted(dimension, true)) {
+		        	  if (DimensionalStructureRestrict.isDebug()) {
+		        		  DimensionalStructureRestrict.logDebugMsg("Cancelled ChunkGenerator.onTryGenerateStructure for Structure: " + structureId.toString() + " for Dimension: " + dimension.toString());
+		        	  }
+			        cir.setReturnValue(false);
+			        return;
+		    	}
 		        return;
 		    }
 
 		    Rule dRule = DimensionalStructureRestrict.DIMENSION_RULES.get(dimension);
-		    if (dRule != null && sRule.isRestricted(structureId, true)) {
+		    if (dRule != null && dRule.isRestricted(structureId, true)) {
+	        	  if (DimensionalStructureRestrict.isDebug()) {
+	        		  DimensionalStructureRestrict.logDebugMsg("Cancelled ChunkGenerator.onTryGenerateStructure for Dimension: " + dimension.toString() + " for Structure: " + structureId.toString());
+	        	  }
 		        cir.setReturnValue(false);
 		        return;
 		    }
