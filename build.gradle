@@ -120,22 +120,101 @@ dependencies {
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
 }
 
+def mixinPackage   = "com.cookta2012.${mod_id}.mixin"
+def pluginPackage  = "${mixinPackage}.plugin"
+def pluginClass    = "${mixin_plugin_class}"
+def pluginFqn      = "${pluginPackage}.${pluginClass}"
+
+def mixinBaseName  = "mixins.${mod_id}"
+def mixinConfigFile = file("${buildDir}/generated/${mixinBaseName}.json")
+
+
+
 mixin {
-    add sourceSets.main, "mixins.dimstructrestrict.refmap.json"   // corrected name
-    config "mixins.dimstructrestrict.json"
+    add sourceSets.main, "${mixinBaseName}.refmap.json"
+    config "${mixinBaseName}.json"                    // instead of hard-coded name
+}
+
+import groovy.io.FileType
+
+task generateMixinConfig {
+    doLast {
+        def mixinsDir = file("src/main/java/" + mixinPackage.replace('.', '/'))
+        def mixinList = []
+
+        if (mixinsDir.exists()) {
+            mixinsDir.eachFileRecurse(FileType.FILES) { file ->
+                if (file.name.endsWith('.java')) {                // filter here
+                    def relPath = file.path.substring(mixinsDir.path.length() + 1)
+                    def fqcn    = relPath.replace(File.separatorChar, '.' as char)
+                                          .replaceFirst(/\.java$/, '')
+                    mixinList << fqcn
+                }
+            }
+        }
+        
+        
+        /* 2. check if the plugin file exists ------------------------- */
+        def pluginFile = file("src/main/java/" +
+                              pluginPackage.replace('.', '/') +
+                              "/${pluginClass}.java")
+                              
+
+        def json = [
+            required: true,
+            package: mixinPackage,
+            mixins: mixinList,
+            refmap: "${mixinBaseName}.refmap.json",
+            compatibilityLevel: "JAVA_17",
+            minVersion: "0.8",
+            injectors: [ defaultRequire: 1 ] 
+        ]
+        
+        if (pluginFile.exists()) {                              // <--- new
+            json['plugin'] = pluginFqn
+        }
+
+        mixinConfigFile.parentFile.mkdirs()
+        mixinConfigFile.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(json))
+    }
 }
 
 tasks.named('processResources', ProcessResources).configure {
-    //var replaceProperties = []
-    //inputs.properties replaceProperties
+    dependsOn generateMixinConfig
+
+    def modLicense = project.findProperty("mod_license") ?: "All Rights Reserved"
+
+    // Dynamically build the mixins block
+    def mixinsBlock = ""
+    def mixinConfigs = ["mixins.${mod_id}.json"]
+
+    if (!mixinConfigs.isEmpty()) {
+        mixinsBlock = mixinConfigs.collect { cfg ->
+            """[[mixins]]
+config="${cfg}"
+"""
+        }.join('\n')
+    }
+
+    from(mixinConfigFile) {
+        into "/"
+    }
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand(
-                version: project.version,
-                mod_id: project.mod_id
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_version: mod_version,
+            mod_description: mod_description,
+            mod_license: modLicense,
+            mc_version_range: mc_version_range,
+            forge_version_range: forge_version_range,
+            version: project.version,
+            mixins_block: mixinsBlock
         )
     }
 }
+
 
 tasks.named('jar', Jar).configure {
     manifest {
