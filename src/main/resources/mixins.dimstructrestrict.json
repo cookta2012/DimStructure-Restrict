@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "package": "com.mattmckenzy.dimensionalcontrol.mixin",
+  "mixins": [
+    "ChunkGeneratorMixin",
+    "FeatureMixin",
+    "JigsawPlacementPlacerMixin",
+    "MobMixin",
+    "NaturalSpawnerMixin",
+    "PlaceCommandMixin",
+    "SpawnPlacementsMixin",
+    "StructureStartMixin",
+    "accessors.FeaturePoolElementAccessor",
+    "accessors.ListPoolElementAccessor",
+    "accessors.SinglePoolElementAccessor",
+    "accessors.StructureManagerAccessor"
+  ],
+  "refmap": "mixins.dimensionalcontrol.refmap.json",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8"
+}
