@@ -1,48 +1,74 @@
-# Dimensional Structure Restrict (DimStructRestrict)
+# Dimensional Control
 
-DimStructRestrict is a lightweight Minecraft Forge mod for **Minecraft 1.20.1** that allows you to **control where structures can spawn** based on dimension and structure rules. Designed and developed by **Troy Allen Cook (@cookta2012)**, this mod provides fine-grained control over world generation behavior — especially useful for modpack developers and world designers.
-
-Initial release will be 1.20.1 other versions will be coming later.
+<img src="logo.png" align="left" height="80" />
+Dimensional Control is a lightweight Minecraft NeoForge mod for <b>Minecraft 1.21.1</b> that allows you to <b>control where resources can spawn</b> based on dimension-based rules. This mod was derived from <b>DimStructRestrict</b>, a mod by <b>Troy Cook (@cookta2012)</b>. This mod provides fine-grained control over world generation and spawning behavior — especially useful for modpack developers and world designers.
 
 ---
 
 ## 🌍 Features
 
-- Prevent or allow specific structures from generating in specific dimensions.
+- Prevent or allow the following resources from generating in specific dimensions:
+  - Structures
+  - Structure Pool Elements (structure pieces)
+  - Features (biome decorations)
+  - Entities (spawning mobs and friendly creatures)
+  - Loot (items filled in generated chests and item drops)
 - Define whitelist or blacklist rules.
-- Optionally flag structures to not place the structure while it believes it placed it.
-- JSON-based configuration — supports comments and regenerates missing keys automatically.
-- Logs rule enforcement with structure/dimension context for debugging.
+- Describe dimension and resource locations with regex to easily create overarching rules.
+- JSON-based configuration.
+- Provides registries.json to easily look up all possible resource locations that you can use to write your definitions.
+- Provides expanded-definitions.json to verify your full definitions once the regex has been expanded.
+- Logs rule enforcement with context for debugging.
 
 ---
 
 ## 🔧 Configuration
 
 The config file is located at:
+
 ```
-<minecraft_root>/config/dimstructrestrict.json
+<minecraft_root>/config/dimensionalcontrol/definitions.json
 ```
 
 If the file doesn't exist, it will be generated with example entries.
-
----
 
 ### 📐 Structure of `dimstructrestrict.json`
 
 ```jsonc
 {
-  "structures": [
-    {                                       // Individual structure rules will override dimension rules FULL STOP
-      "id": "minecraft:village_plains",     // Structure ID
-      "whitelist": ["minecraft:overworld"], // Allowed dimensions
-      "false_place": false,                 // If true, the structure will be "falsely placed" (may break mods)
-      "active": true                        // Whether this rule is active
+  "structures": [ // Defines rules for allowing or denying structures.
+    {                                                 
+      "dimension": "minecraft:overworld",        // Dimension ResourceLocation (ID).
+      "whitelist": ["minecraft:village_plains"], // Allowed structures, defined by ResourceLocation.
+    //"blacklist": []                            // Denied structures, cannot be present with whitelist!
+      "active": true                             // Whether this rule is active.
     }
   ],
-  "dimensions": [
+  "structurePoolElements": [ // Defines rules for allowing or denying structure pool elments.
     {
-      "id": "minecraft:overworld",        // Dimension ID
-      "whitelist": [],                    // Structures allowed in this dimension
+      "dimension": "minecraft:overworld",
+      "blacklist": ["minecraft:village/common/well_bottom"],
+      "active": true
+    }
+  ],
+  "features": [ // Defines rules for allowing or denying features.
+    {
+      "dimension": "minecraft:overworld",
+      "whitelist": ["minecraft:tree"],
+      "active": true
+    }
+  ],
+  "entities": [ // Defines rules for allowing or denying entity spawns.
+    {
+      "dimension": "minecraft:the_end",
+      "blacklist": ["minecraft:enderman"],
+      "active": true
+    }
+  ],
+  "loot": [ // Defines rules for allowing or denying loot.
+    {
+      "dimension": "minecraft:.+",
+      "whitelist": ["minecraft:diamond"],
       "active": true
     }
   ]
@@ -54,37 +80,62 @@ If the file doesn't exist, it will be generated with example entries.
 ## 🧠 Rule Types
 
 ### ✅ `whitelist`
-Only listed dimensions or structures are allowed.
+
+Only listed resources are allowed. Cannot be present if blacklist is already present!
 
 ### ❌ `blacklist`
-Listed dimensions or structures will be prevented.
 
-### ⚙️ `false_place` (optional, default `false`)
-If `true`, prevents the structure from placing **without skipping the generation step** meaning it is marked on the map as generated.
-
-> ⚠️ May cause issues with some structure-dependent mods.
+Listed resources will be prevented. Cannot be present if whitelist is already present!
 
 ### 🔄 `active` (optional, default `false`)
+
 Controls whether the rule is enforced. Useful for temporarily disabling rules without removing them.
 
 ---
 
 ## 🧪 Example Use Case
 
-```json
+```jsonc
 {
   "structures": [
-    {
-      "id": "minecraft:ruined_portal",
-      "blacklist": ["minecraft:the_end", "minecraft:the_nether"],
+    { // This rule will only allow all village types (plains, desert, etc.) to generate in the overworld.
+      // Other structures in the overworld will not generate!
+      "dimension": "minecraft:overworld",
+      "whitelist": ["minecraft:village_.+"],
+      "active": true
+    },
+    { // This rule will prevent the generation of bastion remnants in the nether.
+      "dimension": "minecraft:the_nether",
+      "blacklist": ["minecraft:bastion_remnant"],
+      "active": true
+    },
+  ],
+  "structurePoolElements": [
+    {  // This rule will prevent wells being added to villages during overworld generation.
+      "dimension": "minecraft:overworld",
+      "blacklist": ["minecraft:village/common/well_bottom"],
       "active": true
     }
   ],
-  "dimensions": [
-    {
-      "id": "minecraft:overworld",
-      "whitelist": ["minecraft:village_savanna", "minecraft:village_plains"],
-      "false_place": true,
+  "features": [ 
+    { // This rule will prevent all features except trees to be placed during overworld biome generation.
+      "dimension": "minecraft:overworld",
+      "whitelist": ["minecraft:tree"],
+      "active": true
+    }
+  ],
+  "entities": [
+    { // This rule will prevent enderman from spawning in the end dimension.
+      "dimension": "minecraft:the_end",
+      "blacklist": ["minecraft:enderman"],
+      "active": true
+    }
+  ],
+  "loot": [
+    { // This rule will only permit diamonds to be found in all loot pools of all minecraft dimensions.
+      // This includes mob and block drops as well as generated chests.
+      "dimension": "minecraft:.+",
+      "whitelist": ["minecraft:diamond"],
       "active": true
     }
   ]
@@ -93,28 +144,14 @@ Controls whether the rule is enforced. Useful for temporarily disabling rules wi
 
 ---
 
-## 🛠️ Advanced Setup
-
-The mod uses a generic `Rule` system internally with two maps:
-
-- `STRUCTURE_RULES` for structure-specific rules
-- `DIMENSION_RULES` for dimension-based restrictions
-
-Each `Rule` is backed by:
-- `id`: ResourceLocation
-- `mode`: WHITELIST or BLACKLIST
-- `resource`: Set of targets (structure/dimension IDs)
-- `false_place`: Boolean
-- `active`: Boolean
-
----
-
 ## 🧑‍💻 Developer Notes
 
-- Author: **Troy Cook**
+- Author: <b>MattMckenzy</b>
+- GitHub: [@MattMckenzy](https://github.com/mattmckenzy)
+<br/>
+
+- Original author: <b>Troy Cook</b>
 - GitHub: [@cookta2012](https://github.com/cookta2012)
-- Language: Java
-- Environment: Minecraft Forge for Minecraft 1.20.1
 
 ---
 
@@ -126,4 +163,4 @@ MIT License.
 
 ## 📬 Feedback & Contributions
 
-Feel free to open an issue or fork the project if you'd like to expand the system (e.g., gamerule-based control, datapack integration, or GUI support).
+Feel free to open an issue or fork the project if you'd like to expand the system (e.g., game rule based control, datapack integration, or GUI support).

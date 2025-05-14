@@ -8,3 +8,5 @@
 /.apt_generated_tests/
 /bin
 /run
+/mods/
+/datapacks/
