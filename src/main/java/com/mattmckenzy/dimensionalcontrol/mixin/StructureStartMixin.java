@@ -1,7 +1,7 @@
-package com.cookta2012.dimstructrestrict.mixin;
+package com.mattmckenzy.dimensionalcontrol.mixin;
 
-import com.cookta2012.dimstructrestrict.DimensionalStructureRestrict;
-import com.cookta2012.dimstructrestrict.Rule;
+import com.mattmckenzy.dimensionalcontrol.DimensionalStructureRestrict;
+import com.mattmckenzy.dimensionalcontrol.Rule;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;

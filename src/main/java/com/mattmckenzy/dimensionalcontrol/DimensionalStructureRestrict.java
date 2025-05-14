@@ -1,5 +1,5 @@
-package com.cookta2012.dimstructrestrict;
-import com.cookta2012.dimstructrestrict.Rule.Mode;
+package com.mattmckenzy.dimensionalcontrol;
+import com.mattmckenzy.dimensionalcontrol.Rule.Mode;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.mojang.logging.LogUtils;

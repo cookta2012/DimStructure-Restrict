@@ -1,4 +1,4 @@
-package com.cookta2012.dimstructrestrict;
+package com.mattmckenzy.dimensionalcontrol;
 
 import java.util.Set;
 
