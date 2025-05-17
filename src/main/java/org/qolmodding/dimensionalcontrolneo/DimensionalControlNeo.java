@@ -1,5 +1,7 @@
 package org.qolmodding.dimensionalcontrolneo;
-import org.qolmodding.dimensionalcontrolneo.Rule.Mode;
+import org.qolmodding.dimensionalcontrolneo.implementation.Config;
+import org.qolmodding.dimensionalcontrolneo.implementation.Rule;
+import org.qolmodding.dimensionalcontrolneo.implementation.Rule.Mode;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.mojang.logging.LogUtils;
@@ -18,11 +20,12 @@ import java.nio.file.*;
 import java.util.*;
 
     
-@Mod("dimstructrestrict")
+@Mod(DimensionalControlNeo.MOD_ID)
 public class DimensionalControlNeo {
-	
+    public static final String MOD_ID = "dimensionalcontrolneo";
 	public static final Logger LOGGER = LogUtils.getLogger();
-	
+    public static final Path CONFIG_PATH = FMLPaths.CONFIGDIR.get().resolve(MOD_ID);
+
 
     public static final Map<ResourceLocation, Rule> STRUCTURE_RULES = new HashMap<>();
     public static final Map<ResourceLocation, Rule> DIMENSION_RULES   = new HashMap<>();
@@ -37,14 +40,14 @@ public class DimensionalControlNeo {
     private void setConfigClean() { dirtyConfig = false; }
     
     public static final Boolean isDebug() { 
-    	return DimensionalControlNeoConfig.COMMON.debug.get();
+    	return Config.COMMON.debug.get();
     	};
 
 	public static boolean isLogPreventedStructures() {
-		return DimensionalControlNeoConfig.COMMON.log_prevented_structures.get();
+		return Config.COMMON.log_prevented_structures.get();
 	}
 	public static boolean isLogAllowedStructures() {
-		return DimensionalControlNeoConfig.COMMON.log_allowed_structures.get();
+		return Config.COMMON.log_allowed_structures.get();
 	}
     public static void logDebugMsg(StringBuilder builder) { 
     		logDebugMsg(builder.toString()); 	
@@ -57,7 +60,7 @@ public class DimensionalControlNeo {
     }
     public DimensionalControlNeo() {
     	LOGGER.info("Attempting to load config file"); 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DimensionalControlNeoConfig.COMMON_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.COMMON_SPEC);
         LOGGER.info("Attempting to load json config file"); 
     	loadJSONConfig();
     }

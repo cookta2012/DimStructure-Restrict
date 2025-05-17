@@ -1,9 +1,9 @@
-package org.qolmodding.dimensionalcontrolneo;
+package org.qolmodding.dimensionalcontrolneo.implementation;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class DimensionalControlNeoConfig {
+public class Config {
 
     public static final ForgeConfigSpec COMMON_SPEC;
     public static final Common COMMON;
