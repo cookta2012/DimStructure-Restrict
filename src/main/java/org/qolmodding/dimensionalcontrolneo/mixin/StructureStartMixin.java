@@ -1,7 +1,7 @@
-package com.cookta2012.dimstructrestrict.mixin;
+package org.qolmodding.dimensionalcontrolneo.mixin;
 
-import com.cookta2012.dimstructrestrict.DimensionalStructureRestrict;
-import com.cookta2012.dimstructrestrict.Rule;
+import org.qolmodding.dimensionalcontrolneo.DimensionalControlNeo;
+import org.qolmodding.dimensionalcontrolneo.Rule;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -35,11 +35,11 @@ public abstract class StructureStartMixin {
           if (structureId == null) return;
 
           // 1) per‑structure rule
-          Rule sRule = DimensionalStructureRestrict.STRUCTURE_RULES.get(structureId);
+          Rule sRule = DimensionalControlNeo.STRUCTURE_RULES.get(structureId);
 		    if (sRule != null) {
 		    	if( sRule.isRestricted(dimension, true)) {
-		        	  if (DimensionalStructureRestrict.isDebug()) {
-        		  DimensionalStructureRestrict.logDebugMsg("Cancelled StructureStart.placeInChunk for Structure: " + structureId.toString() + " for Dimension: " + dimension.toString());
+		        	  if (DimensionalControlNeo.isDebug()) {
+        		  DimensionalControlNeo.logDebugMsg("Cancelled StructureStart.placeInChunk for Structure: " + structureId.toString() + " for Dimension: " + dimension.toString());
         	  }
         	  ci.cancel();
 		        return;
@@ -50,11 +50,11 @@ public abstract class StructureStartMixin {
 
           // 2) per‑dimension rule
           //ResourceKey<Level> dimension = ctx.chunkGenerator().getLevel().dimension();
-          Rule dRule = DimensionalStructureRestrict.DIMENSION_RULES.get(dimension);
+          Rule dRule = DimensionalControlNeo.DIMENSION_RULES.get(dimension);
           if (dRule != null && dRule.isRestricted( structureId, false )) {
       		 //throw new IllegalStateException("Attempted to return invalid m,m,m,m");
-        	  if (DimensionalStructureRestrict.isDebug()) {
-        		  DimensionalStructureRestrict.logDebugMsg("Cancelled StructureStart.placeInChunk for Dimension: " + dimension.toString() + " for Structure: " + structureId.toString());
+        	  if (DimensionalControlNeo.isDebug()) {
+        		  DimensionalControlNeo.logDebugMsg("Cancelled StructureStart.placeInChunk for Dimension: " + dimension.toString() + " for Structure: " + structureId.toString());
         	  }
         	  ci.cancel();
               return;

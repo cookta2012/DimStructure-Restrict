@@ -1,4 +1,4 @@
-package com.cookta2012.dimstructrestrict;
+package org.qolmodding.dimensionalcontrolneo;
 
 import java.util.Set;
 

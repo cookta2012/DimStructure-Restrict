@@ -1,5 +1,6 @@
-package com.cookta2012.dimstructrestrict.mixin;
+package org.qolmodding.dimensionalcontrolneo.mixin;
 
+import org.qolmodding.dimensionalcontrolneo.DimensionalControlNeo;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,8 +22,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
-import com.cookta2012.dimstructrestrict.DimensionalStructureRestrict;
-import com.cookta2012.dimstructrestrict.Rule;
+import org.qolmodding.dimensionalcontrolneo.Rule;
 
 
 @Mixin(ChunkGenerator.class)
@@ -48,13 +48,13 @@ public abstract class ChunkGeneratorMixin {
 		    ResourceLocation structureId = registryAccess.registryOrThrow(Registries.STRUCTURE).getKey(structure);
 		    LevelAccessor level = ((StructureManagerAccessor)manager).getLevel();
 		    ResourceLocation dimension = ((WorldGenLevel)level).getLevel().dimension().location();
-		    //DimensionalStructureRestrict.LOGGER.debug("HIT structure: " + structureId + " in Dimension: " + dimension);
+		    //DimensionalControlNeo.LOGGER.debug("HIT structure: " + structureId + " in Dimension: " + dimension);
 		    // dimension/structure filter logic
-		    Rule sRule = DimensionalStructureRestrict.STRUCTURE_RULES.get(structureId);
+		    Rule sRule = DimensionalControlNeo.STRUCTURE_RULES.get(structureId);
 		    if (sRule != null) {
 		    	if( sRule.isRestricted(dimension, true)) {
-		        	  if (DimensionalStructureRestrict.isDebug()) {
-		        		  DimensionalStructureRestrict.logDebugMsg("Cancelled ChunkGenerator.onTryGenerateStructure for Structure: " + structureId.toString() + " for Dimension: " + dimension.toString());
+		        	  if (DimensionalControlNeo.isDebug()) {
+		        		  DimensionalControlNeo.logDebugMsg("Cancelled ChunkGenerator.onTryGenerateStructure for Structure: " + structureId.toString() + " for Dimension: " + dimension.toString());
 		        	  }
 			        cir.setReturnValue(false);
 			        return;
@@ -62,10 +62,10 @@ public abstract class ChunkGeneratorMixin {
 		        return;
 		    }
 
-		    Rule dRule = DimensionalStructureRestrict.DIMENSION_RULES.get(dimension);
+		    Rule dRule = DimensionalControlNeo.DIMENSION_RULES.get(dimension);
 		    if (dRule != null && dRule.isRestricted(structureId, true)) {
-	        	  if (DimensionalStructureRestrict.isDebug()) {
-	        		  DimensionalStructureRestrict.logDebugMsg("Cancelled ChunkGenerator.onTryGenerateStructure for Dimension: " + dimension.toString() + " for Structure: " + structureId.toString());
+	        	  if (DimensionalControlNeo.isDebug()) {
+	        		  DimensionalControlNeo.logDebugMsg("Cancelled ChunkGenerator.onTryGenerateStructure for Dimension: " + dimension.toString() + " for Structure: " + structureId.toString());
 	        	  }
 		        cir.setReturnValue(false);
 		        return;

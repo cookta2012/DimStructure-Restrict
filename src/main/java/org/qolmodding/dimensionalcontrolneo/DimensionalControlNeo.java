@@ -1,5 +1,5 @@
-package com.cookta2012.dimstructrestrict;
-import com.cookta2012.dimstructrestrict.Rule.Mode;
+package org.qolmodding.dimensionalcontrolneo;
+import org.qolmodding.dimensionalcontrolneo.Rule.Mode;
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.mojang.logging.LogUtils;
@@ -19,7 +19,7 @@ import java.util.*;
 
     
 @Mod("dimstructrestrict")
-public class DimensionalStructureRestrict {
+public class DimensionalControlNeo {
 	
 	public static final Logger LOGGER = LogUtils.getLogger();
 	
@@ -37,14 +37,14 @@ public class DimensionalStructureRestrict {
     private void setConfigClean() { dirtyConfig = false; }
     
     public static final Boolean isDebug() { 
-    	return DimensionalStructureRestrictConfig.COMMON.debug.get(); 
+    	return DimensionalControlNeoConfig.COMMON.debug.get();
     	};
 
 	public static boolean isLogPreventedStructures() {
-		return DimensionalStructureRestrictConfig.COMMON.log_prevented_structures.get();
+		return DimensionalControlNeoConfig.COMMON.log_prevented_structures.get();
 	}
 	public static boolean isLogAllowedStructures() {
-		return DimensionalStructureRestrictConfig.COMMON.log_allowed_structures.get();
+		return DimensionalControlNeoConfig.COMMON.log_allowed_structures.get();
 	}
     public static void logDebugMsg(StringBuilder builder) { 
     		logDebugMsg(builder.toString()); 	
@@ -55,9 +55,9 @@ public class DimensionalStructureRestrict {
     		LOGGER.info("[DEBUG]: " + message);
     	
     }
-    public DimensionalStructureRestrict() { 
+    public DimensionalControlNeo() {
     	LOGGER.info("Attempting to load config file"); 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DimensionalStructureRestrictConfig.COMMON_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, DimensionalControlNeoConfig.COMMON_SPEC);
         LOGGER.info("Attempting to load json config file"); 
     	loadJSONConfig();
     }

@@ -1,4 +1,4 @@
-package com.cookta2012.dimstructrestrict;
+package org.qolmodding.dimensionalcontrolneo;
 
 import java.util.Objects;
 import java.util.Set;
@@ -80,15 +80,15 @@ public abstract class Rule {
 	public Boolean isRestricted(ResourceLocation targetResource, Boolean isClean) {
 		// Short circuit due to rule inactive or false_place active
 		if(!this.active) { 
-      	  if (DimensionalStructureRestrict.isDebug()) {
-      		DimensionalStructureRestrict.logDebugMsg("Rule not active: " + this.toString());
+      	  if (DimensionalControlNeo.isDebug()) {
+      		DimensionalControlNeo.logDebugMsg("Rule not active: " + this.toString());
     		    }
 			
 			return false; 
 		}
 		if(this.false_place && isClean) {
-	      	  if (DimensionalStructureRestrict.isDebug()) {
-			DimensionalStructureRestrict.logDebugMsg("Rule set to false_place:" + this.toString());
+	      	  if (DimensionalControlNeo.isDebug()) {
+			DimensionalControlNeo.logDebugMsg("Rule set to false_place:" + this.toString());
 	      	  }
 			return false;
 		}
@@ -108,7 +108,7 @@ public abstract class Rule {
     }
 	
 	private void logAllowedMessage(ResourceLocation targetResource, Boolean isClean) {
-  	  if (DimensionalStructureRestrict.isLogAllowedStructures() ||  DimensionalStructureRestrict.isDebug()) {
+  	  if (DimensionalControlNeo.isLogAllowedStructures() ||  DimensionalControlNeo.isDebug()) {
 	    String ruleType = getType(); // "Dimension" or "Structure"
 	    String modeText = getMode(); // "WHITELIST" or "BLACKLIST"
 	    String preventionType = isClean ? "cleanly" : "uncleanly";
@@ -133,12 +133,12 @@ public abstract class Rule {
 	       .append(" due to ")
 	       .append(reason);
 
-	    DimensionalStructureRestrict.logDebugMsg(msg.toString());
+	    DimensionalControlNeo.logDebugMsg(msg.toString());
   	  }
 	}
 	
 	private void logPreventedStructures(ResourceLocation targetResource, Boolean isClean) {
-		if (DimensionalStructureRestrict.isLogPreventedStructures() || DimensionalStructureRestrict.isDebug()) {
+		if (DimensionalControlNeo.isLogPreventedStructures() || DimensionalControlNeo.isDebug()) {
 	    String ruleType = getType(); // "Dimension" or "Structure"
 	    String modeText = getMode(); // "WHITELIST" or "BLACKLIST"
 	    String preventionType = isClean ? "cleanly" : "uncleanly";
@@ -163,7 +163,7 @@ public abstract class Rule {
 	       .append(" due to ")
 	       .append(reason);
 
-	    DimensionalStructureRestrict.logDebugMsg(msg);
+	    DimensionalControlNeo.logDebugMsg(msg);
 		}
 	}
 

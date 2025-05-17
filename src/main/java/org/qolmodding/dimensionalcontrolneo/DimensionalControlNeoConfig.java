@@ -1,9 +1,9 @@
-package com.cookta2012.dimstructrestrict;
+package org.qolmodding.dimensionalcontrolneo;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
-public class DimensionalStructureRestrictConfig {
+public class DimensionalControlNeoConfig {
 
     public static final ForgeConfigSpec COMMON_SPEC;
     public static final Common COMMON;

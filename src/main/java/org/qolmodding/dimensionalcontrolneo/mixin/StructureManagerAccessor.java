@@ -1,4 +1,4 @@
-package com.cookta2012.dimstructrestrict.mixin;
+package org.qolmodding.dimensionalcontrolneo.mixin;
 
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;

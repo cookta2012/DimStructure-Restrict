@@ -1,6 +1,7 @@
-# Dimensional Structure Restrict (DimStructRestrict)
+# Dimensional Control Neo 
+Previously called Dimensional Structure Restrict (DimStructRestrict)
 
-DimStructRestrict is a lightweight Minecraft Forge mod for **Minecraft 1.20.1** that allows you to **control where structures can spawn** based on dimension and structure rules. Designed and developed by **Troy Cook (@cookta2012)**, this mod provides fine-grained control over world generation behavior — especially useful for modpack developers and world designers.
+Dimensional Control Neo  is a lightweight Minecraft Forge mod for **Minecraft 1.20.1** that allows you to **control where structures can spawn** based on dimension and structure rules. Designed and developed by **Troy Cook (@cookta2012)**, this mod provides fine-grained control over world generation behavior — especially useful for modpack developers and world designers.
 
 Initial release will be 1.20.1 other versions will be coming later.
 
