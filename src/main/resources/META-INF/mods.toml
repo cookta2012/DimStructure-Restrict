@@ -4,14 +4,14 @@ license = "${mod_license}"
 [[mods]]
 displayName="${mod_name}"
 modId = "${mod_id}"
-version = "${version}"
+version = "${mod_version}"
 description='''${mod_description}'''
 
 ${mixins_block}
 
 [[dependencies.${mod_id}]]
 mandatory = true
-modId = "${loaer_mod_name}"
+modId = "${loader_mod_name}"
 ordering = "NONE"
 side = "BOTH"
 versionRange = "${loader_version_range}"
@@ -20,4 +20,10 @@ mandatory = true
 modId = "minecraft"
 ordering = "NONE"
 side = "BOTH"
-versionRange = "${mc_version_range}"
+versionRange = "${minecraft_version_range}"
+[[dependencies.${mod_id}]]
+modId="bookshelf"
+type="required"
+versionRange="[20.2.13,]"
+ordering="NONE"
+side="BOTH"

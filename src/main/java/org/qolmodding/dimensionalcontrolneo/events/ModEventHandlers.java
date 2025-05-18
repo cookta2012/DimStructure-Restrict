@@ -33,7 +33,7 @@ public class ModEventHandlers
                 ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS,
                 helper -> helper.register(
                         ResourceLocation.tryBuild(MOD_ID, GlobalLootModifier.Name),
-                        GlobalLootModifier.CODEC
+                        GlobalLootModifier.CODEC.codec()
                 )
         );
     }
@@ -44,7 +44,7 @@ public class ModEventHandlers
         DataGenerator generator = event.getGenerator();
         PackOutput output = generator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-        
+
         generator.addProvider(
                 event.includeServer(),
                 new GlobalLootModifiersGenerator(output, lookupProvider)

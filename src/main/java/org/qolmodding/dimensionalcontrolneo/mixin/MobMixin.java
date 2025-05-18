@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Mob.class)
-public abstract class MobMixin implements EquipmentUser, Leashable, Targeting
+public abstract class MobMixin
 {
     @Inject(method = "checkMobSpawnRules", at = @At("HEAD"), cancellable = true)
     private static void checkMobSpawnRules(EntityType<? extends Mob> type, LevelAccessor level, MobSpawnType spawnType, BlockPos pos, RandomSource random, CallbackInfoReturnable<Boolean> callbackInfoReturnable)

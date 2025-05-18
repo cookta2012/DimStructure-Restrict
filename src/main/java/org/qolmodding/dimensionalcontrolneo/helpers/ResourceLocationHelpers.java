@@ -1,5 +1,6 @@
 package org.qolmodding.dimensionalcontrolneo.helpers;
 
+import org.jetbrains.annotations.NotNull;
 import org.qolmodding.dimensionalcontrolneo.implementation.Rule;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
@@ -31,7 +32,8 @@ public class ResourceLocationHelpers
         }
         else
         {
-            ResourceLocation resourceLocation = ResourceLocation.parse(resourceLocationString);
+            @NotNull
+            ResourceLocation resourceLocation = ResourceLocation.tryParse(resourceLocationString);
             returnResourceLocations.add(resourceLocation);
         }
 

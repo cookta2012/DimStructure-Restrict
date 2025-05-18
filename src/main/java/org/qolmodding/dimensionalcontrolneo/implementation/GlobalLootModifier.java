@@ -1,6 +1,6 @@
 package org.qolmodding.dimensionalcontrolneo.implementation;
 
-import org.qolmodding.dimensionalcontrolneo.DimensionalControlNeo;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -17,9 +17,8 @@ import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Supplier;
 
 import static org.qolmodding.dimensionalcontrolneo.DimensionalControlNeo.MOD_ID;
 
@@ -36,12 +35,12 @@ public class GlobalLootModifier extends LootModifier
                 LootModifier.codecStart(codecInstance).apply(codecInstance, GlobalLootModifier::new)
     );
 
-    public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> GLOBAL_LOOT_MODIFIER_SERIALIZERS =
+    public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> GLOBAL_LOOT_MODIFIER_SERIALIZERS =
             DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, MOD_ID);
 
     @SuppressWarnings("unused")
-    public static final Supplier<MapCodec<GlobalLootModifier>> MY_LOOT_MODIFIER =
-            GLOBAL_LOOT_MODIFIER_SERIALIZERS.register(Name, () -> GlobalLootModifier.CODEC);
+    public static final RegistryObject<Codec<GlobalLootModifier>> MY_LOOT_MODIFIER =
+            GLOBAL_LOOT_MODIFIER_SERIALIZERS.register(Name, GlobalLootModifier.CODEC::codec);
 
     @Override
     protected @NotNull ObjectArrayList<ItemStack> doApply(ObjectArrayList<ItemStack> generatedLoot, LootContext context)
@@ -70,8 +69,8 @@ public class GlobalLootModifier extends LootModifier
     }
 
     @Override
-    public @NotNull MapCodec<? extends IGlobalLootModifier> codec()
+    public Codec<? extends IGlobalLootModifier> codec()
     {
-        return CODEC;
+        return CODEC.codec();
     }
 }

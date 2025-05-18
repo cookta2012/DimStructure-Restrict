@@ -92,12 +92,16 @@ minecraft {
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 repositories {
+    mavenLocal()
     maven {
         name = "Modrinth"
         url = "https://api.modrinth.com/maven"
         content {
             includeGroup "maven.modrinth"
         }
+    }
+    maven {
+        url 'https://maven.blamejared.com'
     }
     maven {
         url "https://cursemaven.com"
@@ -110,6 +114,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${loader_version}"
     annotationProcessor "org.spongepowered:mixin:0.8.5:processor"
+    implementation 'net.darkhax.bookshelf:Bookshelf-Forge-1.20.1:20.2.13'
 }
 
 def mixinPackage   = "${mod_group_id}.mixin"
@@ -173,22 +178,10 @@ task generateMixinConfig {
 
 tasks.named('processResources', ProcessResources).configure {
     dependsOn generateMixinConfig
-    inputs.properties (
-            minecraft_version           : minecraft_version,
-            minecraft_version_range     : minecraft_version_range,
-            loader_version              : loader_version,
-            loader_version_range        : loader_version_range,
-            mod_id                      : mod_id,
-            mod_name                    : mod_name,
-            mod_license                 : mod_license,
-            mod_version                 : mod_version,
-            mod_authors                 : mod_authors,
-            mod_description             : mod_description
-    )
 
     // Dynamically build the mixins block
     def mixinsBlock = ""
-    def mixinConfigs = ["mixins.${modId}.json"]
+    def mixinConfigs = ["mixins.${mod_id}.json"]
 
     if (!mixinConfigs.isEmpty()) {
         mixinsBlock = mixinConfigs.collect { cfg ->
@@ -201,6 +194,22 @@ config="${cfg}"
     from(mixinConfigFile) {
         into "/"
     }
+
+    inputs.properties (
+            minecraft_version           : minecraft_version,
+            minecraft_version_range     : minecraft_version_range,
+            loader_name                 : loader_name,
+            loader_mod_name             : loader_mod_name,
+            loader_version              : loader_version,
+            loader_version_range        : loader_version_range,
+            mod_id                      : mod_id,
+            mod_name                    : mod_name,
+            mod_license                 : mod_license,
+            mod_version                 : mod_version,
+            mod_authors                 : mod_authors,
+            mod_description             : mod_description,
+            mixins_block                 : mixinsBlock
+    )
 
     filesMatching(['META-INF/mods.toml', 'pack.mcmeta']) {
         expand inputs.properties
